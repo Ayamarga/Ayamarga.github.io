@@ -14,14 +14,38 @@
       margin: auto;
       background: linear-gradient(skyblue, lightgreen);
     }
+    #jumpButton {
+      position: fixed;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      padding: 18px 40px;
+      font-size: 22px;
+      background: gold;
+      color: #333;
+      border: none;
+      border-radius: 32px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0.95;
+      transition: background 0.2s;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    #jumpButton:active {
+      background: orange;
+    }
   </style>
 </head>
 <body>
 <canvas id="gameCanvas" width="400" height="600"></canvas>
+<button id="jumpButton" aria-label="Jump!" tabindex="0">Jump</button>
 
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const jumpBtn = document.getElementById("jumpButton");
 
 // Game variables
 let frames = 0;
@@ -142,19 +166,38 @@ function loop() {
 }
 
 // Input
+function handleJump() {
+  bird.flap();
+}
+
+// Keyboard
 document.addEventListener("keydown", e => {
   if (e.code === "Space") {
-    bird.flap();
+    handleJump();
   }
 });
-canvas.addEventListener("click", () => {
-  bird.flap();
-});
+
+// Canvas click/tap (for desktop/mobile)
+canvas.addEventListener("click", handleJump);
+// Touch for mobile (if you want canvas touch to also jump)
+canvas.addEventListener("touchstart", function(e) {
+  e.preventDefault();
+  handleJump();
+}, {passive:false});
+
+// Jump button click/touch
+jumpBtn.addEventListener("click", handleJump);
+jumpBtn.addEventListener("touchstart", function(e){
+  e.preventDefault();
+  handleJump();
+}, {passive:false});
 
 // Game Over
 function gameOver() {
-  alert("Game Over! Final Score: " + score);
-  document.location.reload();
+  setTimeout(() => {
+    alert("Game Over! Final Score: " + score);
+    document.location.reload();
+  }, 50);
 }
 
 // Start
